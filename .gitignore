@@ -10,3 +10,7 @@ doc/api/
 
 # Passwords file
 config/passwords.yaml
+
+.github/.DS_Store
+
+.DS_Store
