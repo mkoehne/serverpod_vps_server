@@ -1,0 +1,28 @@
+version: '3'
+services:
+    postgresql:
+      image: postgres
+      volumes:
+        - /data/postgres:/var/lib/postgresql/data
+        - /data/postgres:/data/postgres
+      labels:
+        - "traefik.enable=true"
+        - "traefik.tcp.routers.postgresql.rule=HostSNI(`*`)"
+        - "traefik.tcp.routers.postgresql.tls=true"
+        - "traefik.tcp.services.postgresql.loadbalancer.server.port=5432"
+        - "traefik.tcp.routers.postgresql.entrypoints=dbsecure"
+        - "traefik.tcp.routers.postgresql.tls.certresolver=lets-encrypt"
+        - "traefik.tcp.routers.postgresql.service=postgresql"
+        - "traefik.http.routers.postgresql.tls.domains[0].sans=db.example.net"
+      environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=replace_with_password
+      - PGDATA=/data/postgres
+      ports:
+      - "5432:5432"
+      networks:
+        - web
+
+networks:
+  web:
+    external: true

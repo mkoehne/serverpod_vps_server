@@ -1,0 +1,53 @@
+version: '3'
+services:
+  vps-api:
+    image: ghcr.io/mkoehne/serverpod-vps-server:latest
+    container_name: vps-server
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    networks:
+      - web
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+      - "8082:8082"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.vpsapi.entrypoints=web"
+      - "traefik.http.routers.vpsapi.rule=Host(`api.example.com`)"
+      - "traefik.http.middlewares.vpsapi-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.vpsapi.middlewares=vpsapi-https-redirect"
+      - "traefik.http.routers.vpsapi-secure.entrypoints=websecure"
+      - "traefik.http.routers.vpsapi-secure.rule=Host(`pod.example.com`)"
+      - "traefik.http.routers.vpsapi-secure.tls=true"
+      - "traefik.http.routers.vpsapi-secure.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.vpsapi-secure.service=vpsapi"
+      - "traefik.http.services.vpsapi.loadbalancer.server.port=8080"
+      - "traefik.docker.network=web"
+
+      - "traefik.http.routers.vpsinsights.entrypoints=web"
+      - "traefik.http.routers.vpsinsights.rule=Host(`insights.example.com`)"
+      - "traefik.http.middlewares.vpsinsights-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.vpsinsights.middlewares=vpsinsights-https-redirect"
+      - "traefik.http.routers.vpsinsights-secure.entrypoints=websecure"
+      - "traefik.http.routers.vpsinsights-secure.rule=Host(`insights.example.com`)"
+      - "traefik.http.routers.vpsinsights-secure.tls=true"
+      - "traefik.http.routers.vpsinsights-secure.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.vpsinsights-secure.service=vpsinsights"
+      - "traefik.http.services.vpsinsights.loadbalancer.server.port=8081"
+
+      - "traefik.http.routers.vpsapp.entrypoints=web"
+      - "traefik.http.routers.vpsapp.rule=Host(`app.example.com`)"
+      - "traefik.http.middlewares.vpsapp-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.vpsapp.middlewares=vpsapp-https-redirect"
+      - "traefik.http.routers.vpsapp-secure.entrypoints=websecure"
+      - "traefik.http.routers.vpsapp-secure.rule=Host(`app.example.com`)"
+      - "traefik.http.routers.vpsapp-secure.tls=true"
+      - "traefik.http.routers.vpsapp-secure.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.vpsapp-secure.service=vpsapp"
+      - "traefik.http.services.vpsapp.loadbalancer.server.port=8082"
+      
+networks:
+  web:
+    external: true
